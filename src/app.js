@@ -10,7 +10,7 @@ const { model } = require("mongoose");
 
 const{ validatesignup }= require("./utiles/validation");
 
-const bcrypt = require("bcrypt");
+
 const cookiparser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 
@@ -18,6 +18,8 @@ const jwt = require("jsonwebtoken");
 app.use(express.json());
 app.use(cookiparser());
 
+const {userauth} = require("./middelwares/auth")
+// signup api
 app.post("/signup", async (req,res)=>
 {
     // const newuser =  new User({
@@ -67,15 +69,15 @@ app.post("/login",async (req,res)=>
         {
             res.send("invalid mail id");
         }
-        const ispassword =  await bcrypt.compare(password,user.password)
+        const ispassword =  await user.getvalidate(password);
 
         if(ispassword)
         {
 
             // creating the jwt token
 
-            const jwttoken =  await jwt.sign({_id:user._id},"soham@44")//secret key
-          //  console.log(jwttoken);
+            const jwttoken =  await user.getJWT();//secret key
+          
 
             // creating the cookie 
            res.cookie("token",jwttoken);
@@ -90,21 +92,21 @@ app.post("/login",async (req,res)=>
     }
 })
 
+// send the connection request to the user api 
+
+app.post("/sendconnection",userauth,async(req,res)=>
+{
+    const user = req.user;
+    res.send(user.firstname+"sent a connection request");
+})
+
 // creating the profile api 
 
-app.get("/profile", async(req,res)=>
+app.get("/profile",userauth, async (req,res)=>
 {
    try{
-         const cookie = req.cookies;
-         const {token} =cookie ;
-       //  console.log(token);
-         
-
-         const  decoded = await  jwt.verify(token, 'soham@44');
-
-          const {_id} = decoded;
-         // console.log(_id)
-         const user = await User.findById(_id);
+    console.log(req.user);
+         const user = req.user;
          res.send(user);
          
    }
