@@ -6,17 +6,163 @@ const app= express();
 const mongoosedb = require('./config/database');
 
 const User = require("./model/user");
+const { model } = require("mongoose");
+
+const{ validatesignup }= require("./utiles/validation");
+
+const bcrypt = require("bcrypt");
+
+
+app.use(express.json());
 
 app.post("/signup", async (req,res)=>
 {
-    const newuser =  new User({
-     firstname:"soham",
-     lastname:"nagare",
-     email:"nagaresoham7@gamil.com",
-     address:"ichalkaranji",
-    })
-    await newuser.save();
-    res.send("added succesfully");
+    // const newuser =  new User({
+    //  firstname:"soham",
+    //  lastname:"nagare",
+    //  email:"nagaresoham7@gamil.com",
+    //  address:"ichalkaranji",
+    // })
+    // await newuser.save();
+    //  res.send("added succesfully");
+
+    // const newuser = new User(req.body);
+
+    try{
+        validatesignup(req);
+
+        const {firstname , lastname , email, password} = req.body;
+
+        const passswordhash = await bcrypt.hash(password,10);
+        // const newuser = new User(req.body);
+        const newuser = new User({
+            firstname,
+            lastname,
+            email
+            ,password:passswordhash,
+        })
+           await newuser.save();
+           res.send("added succesfully");
+    }
+    catch(err){
+        res.status(404).send("error is occured and why:" + err.message);
+    }
+})
+
+
+//login api of the user
+
+app.post("/login",async (req,res)=>
+{
+    try{
+       
+        const {email,password} = req.body;
+
+        const user = await  User.findOne({email:email});
+
+        if(!user)
+        {
+            res.send("invalid mail id");
+        }
+        const ispassword =  await bcrypt.compare(password,user.password)
+
+        if(ispassword)
+        {
+            res.send("login succefully");
+        }
+        else{
+            res.send("password is incorrect");
+        }
+    }
+    catch(err){
+              res.send("error in this"+err.message)
+    }
+})
+
+// getting the all users from the database;
+
+app.get("/user",async(req,res)=>
+{
+    const name = req.body.firstname;
+    //console.log(name);
+ 
+      try{
+        const username = await User.find({firstname:name});
+        if(username.length===0)
+        {
+            res.status(404).send("user not found");
+        }
+        else
+        {
+            res.send(username);
+        }
+      }
+       catch{
+        res.status(400).send("somthing went wrong");
+       }
+})
+
+// getting all the documents from the database;
+
+app.get("/feed", async(req,res)=>
+{
+     try
+     {
+        const data = await User.find({});
+        res.send(data);
+     }
+     catch{
+         res.status(404).send("somthing went wrong");
+     }
+})
+
+// findin the only one
+
+app.get("/find",async (req,res)=>
+
+{
+     const username = req.body.firstname;
+    try{
+          const finder = await User.findOne({firstname:username});
+          res.send(finder);
+    }
+    catch{
+        res.status(400).send("wrong.......")
+    }
+})
+
+//delete the user from the database
+
+app.delete("/del", async (req,res)=>
+{
+    const deldata= req.body.userId;
+
+    try
+    {
+      const deleteddata = await User.findByIdAndDelete({_id:deldata});
+      res.send("deleted succesfully");
+    }
+    catch
+    {
+        res.status(400).send("not deleted yet.......")
+    }
+})
+
+//updatting the document in the database;
+
+app.patch("/update",async(req,res)=>
+{
+    const userId= req.body.userId;
+    const data = req.body;
+
+    try{
+         const dataup = await User.findByIdAndUpdate(userId,data);
+         res.send("updated succesfully");    
+
+    }
+    catch{
+        res.status(400).send("not updated  yet.......");
+    }
 })
 
 mongoosedb()
