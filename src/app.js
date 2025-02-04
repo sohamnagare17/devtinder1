@@ -1,120 +1,118 @@
 const express= require("express");
-
-
 const app= express();
- 
 const mongoosedb = require('./config/database');
-
 const User = require("./model/user");
 const { model } = require("mongoose");
-
-const{ validatesignup }= require("./utiles/validation");
-
-
+//const{ validatesignup }= require("./utiles/validation");
 const cookiparser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-
-
 app.use(express.json());
 app.use(cookiparser());
 
-const {userauth} = require("./middelwares/auth")
+const userauth = require("./routes/userauth");
+const profileauth = require("./routes/profile");
+const serverauth = require("./routes/serverconnection");
+
+app.use("/",userauth);
+app.use("/",profileauth);
+app.use("/",serverauth);
+
+//const {userauth} = require("./middelwares/auth")
 // signup api
-app.post("/signup", async (req,res)=>
-{
-    // const newuser =  new User({
-    //  firstname:"soham",
-    //  lastname:"nagare",
-    //  email:"nagaresoham7@gamil.com",
-    //  address:"ichalkaranji",
-    // })
-    // await newuser.save();
-    //  res.send("added succesfully");
+// app.post("/signup", async (req,res)=>
+// {
+//     // const newuser =  new User({
+//     //  firstname:"soham",
+//     //  lastname:"nagare",
+//     //  email:"nagaresoham7@gamil.com",
+//     //  address:"ichalkaranji",
+//     // })
+//     // await newuser.save();
+//     //  res.send("added succesfully");
 
-    // const newuser = new User(req.body);
+//     // const newuser = new User(req.body);
 
-    try{
-        validatesignup(req);
+//     try{
+//         validatesignup(req);
 
-        const {firstname , lastname , email, password} = req.body;
+//         const {firstname , lastname , email, password} = req.body;
 
-        const passswordhash = await bcrypt.hash(password,10);
-        // const newuser = new User(req.body);
-        const newuser = new User({
-            firstname,
-            lastname,
-            email
-            ,password:passswordhash,
-        })
-           await newuser.save();
-           res.send("added succesfully");
-    }
-    catch(err){
-        res.status(404).send("error is occured and why:" + err.message);
-    }
-})
+//         const passswordhash = await bcrypt.hash(password,10);
+//         // const newuser = new User(req.body);
+//         const newuser = new User({
+//             firstname,
+//             lastname,
+//             email
+//             ,password:passswordhash,
+//         })
+//            await newuser.save();
+//            res.send("added succesfully");
+//     }
+//     catch(err){
+//         res.status(404).send("error is occured and why:" + err.message);
+//     }
+// })
 
 
 //login api of the user
 
-app.post("/login",async (req,res)=>
-{
-    try{
+// app.post("/login",async (req,res)=>
+// {
+//     try{
        
-        const {email,password} = req.body;
+//         const {email,password} = req.body;
 
-        const user = await  User.findOne({email:email});
+//         const user = await  User.findOne({email:email});
 
-        if(!user)
-        {
-            res.send("invalid mail id");
-        }
-        const ispassword =  await user.getvalidate(password);
+//         if(!user)
+//         {
+//             res.send("invalid mail id");
+//         }
+//         const ispassword =  await user.getvalidate(password);
 
-        if(ispassword)
-        {
+//         if(ispassword)
+//         {
 
-            // creating the jwt token
+//             // creating the jwt token
 
-            const jwttoken =  await user.getJWT();//secret key
+//             const jwttoken =  await user.getJWT();//secret key
           
 
-            // creating the cookie 
-           res.cookie("token",jwttoken);
-            res.send("login succefully");
-        }
-        else{
-            res.send("password is incorrect");
-        }
-    }
-    catch(err){
-              res.send("error in this"+err.message)
-    }
-})
+//             // creating the cookie 
+//            res.cookie("token",jwttoken);
+//             res.send("login succefully");
+//         }
+//         else{
+//             res.send("password is incorrect");
+//         }
+//     }
+//     catch(err){
+//               res.send("error in this"+err.message)
+//     }
+// })
 
 // send the connection request to the user api 
 
-app.post("/sendconnection",userauth,async(req,res)=>
-{
-    const user = req.user;
-    res.send(user.firstname+"sent a connection request");
-})
+// app.post("/sendconnection",userauth,async(req,res)=>
+// {
+//     const user = req.user;
+//     res.send(user.firstname+"sent a connection request");
+// })
 
 // creating the profile api 
 
-app.get("/profile",userauth, async (req,res)=>
-{
-   try{
-    console.log(req.user);
-         const user = req.user;
-         res.send(user);
+// app.get("/profile",userauth, async (req,res)=>
+// {
+//    try{
+//     console.log(req.user);
+//          const user = req.user;
+//          res.send(user);
          
-   }
-   catch(err)
-   {
-       res.status(404).send("ERROR"+err.message )
-   }
-})
+//    }
+//    catch(err)
+//    {
+//        res.status(404).send("ERROR"+err.message )
+//    }
+// })
 
 // getting the all users from the database;
 
