@@ -76,4 +76,14 @@ authrouter.post("/signup", async (req,res)=>
                   res.send("error in this"+err.message)
         }
     })
+
+// logout api
+
+authrouter.post("/logout",async (req,res)=>
+{
+    res.cookie("token",null,{
+        expires:new Date(Date.now())
+    })
+    res.send("logout succesfully");
+})
 module.exports = authrouter;
