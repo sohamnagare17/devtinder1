@@ -11,10 +11,12 @@ app.use(cookiparser());
 const userauth = require("./routes/userauth");
 const profileauth = require("./routes/profile");
 const serverauth = require("./routes/serverconnection");
+const userrouter = require("./routes/userrouter");
 
 app.use("/",userauth);
 app.use("/",profileauth);
 app.use("/",serverauth);
+app.use("/",userrouter);
 
 //const {userauth} = require("./middelwares/auth")
 // signup api

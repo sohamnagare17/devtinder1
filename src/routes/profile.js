@@ -41,7 +41,8 @@ profileroute.patch("/profile/edit",userauth,async (req,res)=>
     }
     catch(err)
     {
-       throw new Error("this is "+ err.message);
+       //throw new Error("this is "+ err.message);
+       res.send("this is wrong");
     }
 })
 

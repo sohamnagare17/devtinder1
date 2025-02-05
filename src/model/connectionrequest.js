@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
+const user = require("../model/user");
 const connectionrequestschema = new mongoose.Schema(
     {
         fromuserId:{
             type:mongoose.Schema.Types.ObjectId,
             required:true,
+            ref:user,
         },
         touserId:
         {
@@ -15,7 +17,7 @@ const connectionrequestschema = new mongoose.Schema(
             type:String,
             required:true,
             enum:{
-                values:["intrested","ignore","accepted","rejected"],
+                values:["interested","ignore","accepted","rejected"],
                 message:"`${VALUE}` is not valid",
             }
         }
@@ -30,9 +32,9 @@ connectionrequestschema.pre("save",function(next)
     const user = this;
     if(user.fromuserId.equals(user.touserId))
     {
-       throw new Error("not possible");
+       throw new Error("not possible")
     }
-    next();
+    next()
 })
 
 const Connectionrequest = new mongoose.model("Connectionrequest",connectionrequestschema );
