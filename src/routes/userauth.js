@@ -23,7 +23,7 @@ authrouter.post("/signup", async (req,res)=>
         try{
             validatesignup(req);
     
-            const {firstname , lastname , email, password} = req.body;
+            const {firstname , lastname , email, password,age,photourl} = req.body;
     
             const passswordhash = await bcrypt.hash(password,10);
             // const newuser = new User(req.body);
@@ -32,6 +32,8 @@ authrouter.post("/signup", async (req,res)=>
                 lastname,
                 email
                 ,password:passswordhash,
+                age,
+                photourl,
             })
                await newuser.save();
                res.send("added succesfully");
@@ -48,17 +50,23 @@ authrouter.post("/signup", async (req,res)=>
            
             const {email,password} = req.body;
     
-            const user = await  User.findOne({email:email});
+            const user = await  User.findOne({email});
+          //  res.send(user);
     
             if(!user)
             {
-                res.send("invalid mail id");
+                //  res.send("invalid mail id");
+                return  res.send("invalid  email id");
+                // throw new Error("invalid mail")
+                 
             }
             const ispassword =  await user.getvalidate(password);
     
-            if(ispassword)
+            if(!ispassword)
             {
-    
+              
+                return res.send("invalid password");
+            }
                 // creating the jwt token
     
                 const jwttoken =  await user.getJWT();//secret key
@@ -66,16 +74,39 @@ authrouter.post("/signup", async (req,res)=>
     
                 // creating the cookie 
                res.cookie("token",jwttoken);
-                res.send("login succefully");
-            }
-            else{
-                res.send("password is incorrect");
-            }
+              res.send(user);
+        
         }
         catch(err){
                   res.send("error in this"+err.message)
         }
     })
+
+
+    // authrouter.post("/login", async (req, res) => {
+    //     try {
+    //         const { email, password } = req.body;
+    
+    //         const user = await User.findOne({ email: email });
+    
+    //         if (!user) {
+    //             return res.status(400).send("Invalid email ID");  // ⬅️ Return stops execution
+    //         }
+    
+    //         const isPasswordValid = await user.getvalidate(password);
+    
+    //         if (!isPasswordValid) {
+    //             return res.status(400).send("Password is incorrect");  // ⬅️ Return stops execution
+    //         }
+    
+    //         const jwttoken = await user.getJWT();
+    //         res.cookie("token", jwttoken);
+    //         return res.status(200).send("Login successful");  // ✅ No extra responses
+    //     } catch (err) {
+    //         return res.status(500).send("Error: " + err.message);  // ✅ Proper error handling
+    //     }
+    // });
+    
 
 // logout api
 

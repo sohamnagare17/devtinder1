@@ -9,7 +9,7 @@ const User = require("../model/user")
 profileroute.get("/profile/view",userauth, async (req,res)=>
     {
        try{
-        console.log(req.user);
+       // console.log(req.user);
              const user = req.user;
              res.send(user);
              
@@ -26,7 +26,7 @@ profileroute.patch("/profile/edit",userauth,async (req,res)=>
        // validateeditdata(req);
         if(!validateeditdata(req))
         {
-            res.send("ediatable data is invalid");
+           return res.send("ediatable data is invalid");
         }
         else{
         // updating the data
@@ -36,7 +36,7 @@ profileroute.patch("/profile/edit",userauth,async (req,res)=>
 
             res.send(edituser);
           
-            res.send("data edit succefully");
+            
         }
     }
     catch(err)

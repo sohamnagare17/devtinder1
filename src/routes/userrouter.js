@@ -79,7 +79,7 @@ userrouter.get("/feed",userauth,async(req,res)=>
 
       const feeduser = await User.find({
         $and:[  {_id:{$nin:Array.from(hideuser)}} ,{_id:{$ne:loggedin._id}}]
-      }).select("firstname lastname age")
+      }).select("firstname lastname  photourl")
       res.send(feeduser);
 
   }

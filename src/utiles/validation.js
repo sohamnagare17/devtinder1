@@ -21,7 +21,7 @@ const validatesignup = (req)=>
 
 const validateeditdata = (req) =>
 {
-    const allowfield = ["firstname","lastname","age"];
+    const allowfield = ["firstname","lastname","age","photourl"];
 
    const isalloed= Object.keys(req.body).every(ele => allowfield.includes(ele));
    return isalloed;

@@ -17,13 +17,13 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/user")
 
-const userauth = async  (req ,res , next)=>
+const userauth = async (req ,res , next)=>
 {
   try{
     const {token} = req.cookies;
     if(!token)
     {
-      throw new Error("invalid token");
+        return res.status(401).send("invalid token");
     }
    
     const decodedata = await jwt.verify(token,"soham@44");
@@ -33,7 +33,7 @@ const userauth = async  (req ,res , next)=>
     const user = await User.findById(_id);
     if(!user)
     {
-      res.send("invalid user");
+      return res.send("invalid user");
     }
      req.user = user;
      next();

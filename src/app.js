@@ -3,10 +3,18 @@ const app= express();
 const mongoosedb = require('./config/database');
 const User = require("./model/user");
 const { model } = require("mongoose");
+const cors = require("cors");
+
 //const{ validatesignup }= require("./utiles/validation");
 const cookiparser = require("cookie-parser");
 app.use(express.json());
 app.use(cookiparser());
+app.use(cors(
+    {
+        origin:"http://localhost:5173",
+        credentials:true,
+    }
+));
 
 const userauth = require("./routes/userauth");
 const profileauth = require("./routes/profile");
@@ -141,17 +149,18 @@ app.get("/user",async(req,res)=>
 
 // getting all the documents from the database;
 
-app.get("/feed", async(req,res)=>
-{
-     try
-     {
-        const data = await User.find({});
-        res.send(data);
-     }
-     catch{
-         res.status(404).send("somthing went wrong");
-     }
-})
+// app.get("/feed", async(req,res)=>
+// {
+//      try
+//      {
+//         const data = await User.find({});
+        
+//         res.send(data);
+//      }
+//      catch{
+//          res.status(404).send("somthing went wrong");
+//      }
+// })
 
 // findin the only one
 
